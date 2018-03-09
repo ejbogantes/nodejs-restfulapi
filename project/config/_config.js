@@ -2,7 +2,6 @@
  * This file is for all the global configuration values
  */
 
-
 //Environment variables
 require('dotenv').config()
 

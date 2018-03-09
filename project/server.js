@@ -24,6 +24,14 @@ SwaggerExpress.create(config, function(err, swaggerExpress) {
   //Here we listen to the "X" port
   app.listen(config.appPort);
 
+  //test
+  //var Model    = require('./api/core/model');
+  //var myModel  = new Model({});
+  //myModel.save(); 
+  //myModel.delete(1); 
+  //myModel.find(1); 
+
+
   //Print that server is running
   console.log('API running on http://localhost:' + config.appPort);
 });
