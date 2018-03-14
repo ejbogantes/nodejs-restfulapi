@@ -7,4 +7,9 @@ echo "#         Node.js RESTful Start        #"
 echo "########################################"
 echo ""
 
-docker-compose up --build -d mongodb nodejs mongo-express swagger-ui
+docker-compose down --remove-orphans
+docker-compose build
+docker-compose up -d mongo
+docker-compose up -d swagger-ui 
+docker-compose up -d mongo-express
+docker-compose up nodejs 

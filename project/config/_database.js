@@ -2,34 +2,33 @@
  * This file is for all database configuration values
 */
 
-var database = {
+var Database = {
     mongodb: {
-        driver: process.env.MONGO_DRIVER || 'mongoose', 
-        host: process.env.MONGO_HOST || 'mongodb',
-        username: process.env.MONGO_USERNAME || '',
-        password: process.env.MONGO_PASSWORD || '',
-        port: process.env.MONGO_PORT || '27017',
-        database_name: process.env.MONGO_DATABASE_NAME || 'nodejs-restful',
+        host: process.env.DB_HOST || 'mongodb',
+        username: process.env.DB_USERNAME || '',
+        password: process.env.DB_PASSWORD || '',
+        port: process.env.DB_PORT || 27017,
+        name: process.env.DB_NAME || 'nodejs-restful',
     },
-    redis:{
+    redis: {
         //Fill it with the corresponding values
     },
-    mysql:{
+    mysql: {
         //Fill it with the corresponding values
     },
-    mariadb:{
+    mariadb: {
         //Fill it with the corresponding values
     },
-    neo4j:{
+    neo4j: {
         //Fill it with the corresponding values
     },
-    sqlserver:{
+    sqlserver: {
         //Fill it with the corresponding values
     },
-    oracle:{
+    oracle: {
         //Fill it with the corresponding values
     }
 };
 
 //Exports the database configuration
-module.exports  = database;
+module.exports = Database;
