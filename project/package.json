@@ -4,9 +4,9 @@
   "description": "This is a RESTful API developed using Node.js",
   "main": "server.js",
   "scripts": {
-    "start": "nodemon server.js",
-    "test": "echo \"Error: no test specified\" && exit 1",
-    "install": "node installer.js"
+    "prestart": "npm install -g swagger",
+    "start": "npm install --unsafe-perm && nodemon server.js",
+    "test": "echo \"Error: no test specified\" && exit 1"
   },
   "keywords": [
     "nodejs",
@@ -36,7 +36,6 @@
   },
   "devDependencies": {
     "nodemon": "^1.17.1",
-    "package-script": "0.0.8",
     "should": "^7.1.0",
     "supertest": "^1.0.0"
   }

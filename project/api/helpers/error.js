@@ -2,7 +2,7 @@
 'use strict';
 
 //The required modules
-const schemas = require('pretty-error');
+const PrettyError = require('pretty-error');
 
 module.exports = {
 
