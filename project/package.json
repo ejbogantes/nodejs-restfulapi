@@ -4,7 +4,6 @@
   "description": "This is a RESTful API developed using Node.js",
   "main": "server.js",
   "scripts": {
-    "prestart": "npm install -g swagger",
     "start": "npm install --unsafe-perm && nodemon server.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },

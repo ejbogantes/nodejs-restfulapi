@@ -21,7 +21,7 @@ services:
     ports:
       - "27017:27017"
     volumes:
-      - restful-data:/data/db
+      - restful-mongo:/data/db
     networks:
       - restful-net
   mongo-express:
@@ -55,4 +55,5 @@ services:
 networks:
   restful-net:
 volumes:
-  restful-data:
+  restful-mongo:
+
