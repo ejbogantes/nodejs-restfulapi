@@ -10,7 +10,7 @@ const fn = require('../functions');
 const conn = config.databaseConns.mongodb;
 
 //Connection String 
-var connString = 'mongodb://x';
+var connString = 'mongodb://';
 connString += conn.host + ':';
 connString += conn.port + '/' + conn.name;
 
@@ -24,40 +24,45 @@ const connOptions = {
 module.exports = {
 
     //This is the save and update function
-    save: async function (options, callback) {
+    save: function (options) {
 
-        //Let's connect to mongodb
-        mongoose.connect(connString, function (err) {
+        //We use a promise to handle the function
+        return new Promise(function (resolve, reject) {
 
-            //if there
-            if (err) {
-                callback(new Error(err));
-            } else {
+            //Let's connect to mongodb
+            mongoose.connect(connString, connOptions).then(
+                () => {
 
-                //Build the Mongoose Schema
-                const Schema = mongoose.Schema(fn.buildSchema(options.schema));
+                    //Build the Mongoose Schema
+                    const Schema = mongoose.Schema(fn.buildSchema(options.schema));
 
-                //Generate the model
-                const Model = mongoose.model(options.table, Schema);
+                    //Generate the model
+                    const Model = mongoose.model(options.table, Schema);
 
-                //Create the object
-                let Obj = new Model(options.attributes);
+                    //Create the object
+                    let Obj = new Model(options.attributes);
 
-                //Try to save / update the record
-                Obj.save(function (err, result) {
+                    //Try to save / update the record
+                    Obj.save(function (err, result) {
+
+                        
+                        if (err) {
+                            //if there is an error then return it
+                            reject(new Error(err));
+                        } else {
+                            //if a response is received
+                            resolve(result);
+                        }
+
+                    });
+                },
+                err => {
 
                     //if there is an error then return it
-                    if (err) {
-                        callback(new Error(err));
-                    } else {
-                        //if a response is received
-                        callback(result);
-                    }
-
-                });
-            }
+                    reject(new Error(err));
+                }
+            );
         });
-
     },
 
     //This is the delete function

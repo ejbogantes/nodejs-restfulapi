@@ -7,5 +7,9 @@ module.exports = {
     string: {
         mongoose: String,
         sequelize: Sequelize.STRING
+    },
+    number: {
+        mongoose: Number,
+        sequelize: Sequelize.INTEGER
     }
 };

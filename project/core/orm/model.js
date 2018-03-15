@@ -15,13 +15,13 @@ class Model {
 
     /**
      * Class Contructor
-     * @param {*} schema 
      * @param {*} database 
      */
-    constructor(schema, database = config.defaultDBConn) {
-        this.table = this.constructor.name;
-        this.database = database;
-        this.schema = schema;
+    constructor(attributes, database = config.defaultDBConn) {
+        this.table       = this.constructor.name;
+        this.database    = database;
+        this.schema      = this.schema();
+        this.attributes  = attributes;
     }
 
     /**
@@ -38,7 +38,7 @@ class Model {
             //If there is an error
             if (driver instanceof Error) {
 
-                console.log(driver);
+                errorsHelper.print(driver);
 
             } else {
 
@@ -46,22 +46,18 @@ class Model {
                 let options = {
                     table: thisObject.table,
                     schema: thisObject.schema,
-                    attributes: {
-                        name: 'Emilio'
-                    }
+                    attributes: thisObject.attributes
                 };
 
                 //We try to save the record
-                driver.save(options,
-                    function (result) {
-                        if (result instanceof Error) {
-                            errorsHelper.print(result);
-                            return false;
-                        } else {
-                            return result;
-                        }
-                    });
-
+                driver.save(options).then(function (result) {
+                    return result;
+                },
+                function (err) {
+                        errorsHelper.print(err);
+                        return false;
+                });
+                
             }
         });
     }
@@ -80,7 +76,13 @@ class Model {
      */
     find(id, callback) {
         console.log(`This is the find function`);
-    }
+    }   
+
+
+    //schema function used for all models
+    schema(){
+        return {};
+    } 
 }
 
 //Here we export the class

@@ -25,12 +25,22 @@ SwaggerExpress.create(config, function(err, swaggerExpress) {
   app.listen(config.appPort);
 
   //test
-  let Model    = require('./core/orm/model');
-  let myModel  = new Model({
-    name: 'string'
+  let User           = require('./api/models/user');
+  let u              = new User({
+    _id: 1,
+    document: '207010082',
+    name: 'Emilio',
+    last_name: 'Bogantes',
+    email: 'ejbogantes@gmail.com',
+    password: '12345'
   });
 
-  myModel.save(); 
+
+  console.log(u.schema);
+  console.log(u.attributes);
+  
+
+  u.save(); 
 
   //Print that server is running
   console.log('API running on http://localhost:' + config.appPort);
