@@ -11,11 +11,11 @@ const SwaggerExpress = require('swagger-express-mw');
 var app = require('express')();
 
 //CORS capabilites
-const cors  = require('cors');
+const cors = require('cors');
 app.use(cors());
 
 //This create the SwaggerExpress App
-SwaggerExpress.create(config, function(err, swaggerExpress) {
+SwaggerExpress.create(config, function (err, swaggerExpress) {
   if (err) { throw err; }
 
   // install middleware
@@ -25,8 +25,8 @@ SwaggerExpress.create(config, function(err, swaggerExpress) {
   app.listen(config.appPort);
 
   //test
-  let User           = require('./api/models/user');
-  let u              = new User({
+  let User = require('./api/models/user');
+  let u = new User({
     _id: 1,
     document: '207010082',
     name: 'Emilio',
@@ -35,12 +35,14 @@ SwaggerExpress.create(config, function(err, swaggerExpress) {
     password: '12345'
   });
 
+  u.name = 'Emilio José';
+  u.save().then(function (result) {
+    console.log(result);
+  },
+    function (err) {
+      console.log(err);
+    });
 
-  console.log(u.schema);
-  console.log(u.attributes);
-  
-
-  u.save(); 
 
   //Print that server is running
   console.log('API running on http://localhost:' + config.appPort);

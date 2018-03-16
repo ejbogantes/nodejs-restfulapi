@@ -42,18 +42,41 @@ module.exports = {
                     //Create the object
                     let Obj = new Model(options.attributes);
 
-                    //Try to save / update the record
-                    Obj.save(function (err, result) {
 
-                        
+                    //Check if the record exists or not
+                    Model.count({ _id: Obj._id }, function (err, count) {
+
                         if (err) {
                             //if there is an error then return it
                             reject(new Error(err));
-                        } else {
-                            //if a response is received
-                            resolve(result);
                         }
 
+                        if (count > 0) {
+                           
+                            //Try to update the existing new record
+                            Obj.update(options.attributes, function (err, result) {
+                                if (err) {
+                                    //if there is an error then return it
+                                    reject(new Error(err));
+                                } else {
+                                    //if a response is received
+                                    resolve(true);
+                                }
+                            });
+
+                        } else {
+                           
+                            //Try to save  the new record
+                            Obj.save(function (err, result) {
+                                if (err) {
+                                    //if there is an error then return it
+                                    reject(new Error(err));
+                                } else {
+                                    //if a response is received
+                                    resolve(result);
+                                }
+                            });
+                        }
                     });
                 },
                 err => {

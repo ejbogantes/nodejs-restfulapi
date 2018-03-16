@@ -18,47 +18,55 @@ class Model {
      * @param {*} database 
      */
     constructor(attributes, database = config.defaultDBConn) {
-        this.table       = this.constructor.name;
-        this.database    = database;
-        this.schema      = this.schema();
-        this.attributes  = attributes;
+        //public attributes
+        this.table = this.constructor.name;
+        this.database = database;
+        //private attributes
+        var _attributes = attributes;
+        //private getters and setters
+        this.setAttributes = function (value) {
+            _attributes = value;
+            fn.assignAttributes(_attributes, this);
+        }
+        this.getAttributes = function () {
+            _attributes = fn.syncAttributes(_attributes, this);
+            return _attributes;
+        }
+        //dynamically assign the attributes
+        fn.assignAttributes(_attributes, this);
     }
 
     /**
      *  Saves or updates a record
-     * @param {*} callback 
      */
-    save(callback) {
+    save() {
         //we keep the reference
         let thisObject = this;
 
-        //Here we try to get the driver
-        fn.getDBDriver(this.database, function (driver) {
+        return new Promise(function (resolve, reject) {
 
-            //If there is an error
-            if (driver instanceof Error) {
-
-                errorsHelper.print(driver);
-
-            } else {
-
-                //Options for the Driver
-                let options = {
-                    table: thisObject.table,
-                    schema: thisObject.schema,
-                    attributes: thisObject.attributes
-                };
-
-                //We try to save the record
-                driver.save(options).then(function (result) {
-                    return result;
-                },
-                function (err) {
-                        errorsHelper.print(err);
-                        return false;
-                });
-                
-            }
+            //Here we try to get the driver
+            fn.getDBDriver(thisObject.database, function (driver) {
+                //If there is an error
+                if (driver instanceof Error) {
+                    errorsHelper.print(driver);
+                } else {
+                    //Options for the Driver
+                    let options = {
+                        table: thisObject.table,
+                        schema: thisObject.schema(),
+                        attributes: thisObject.getAttributes()
+                    };
+                    //We try to save the record
+                    driver.save(options).then(function (result) {
+                        resolve(result);
+                    },
+                        function (err) {
+                            errorsHelper.print(err);
+                            reject(err);
+                        });
+                }
+            });
         });
     }
 
@@ -76,13 +84,37 @@ class Model {
      */
     find(id, callback) {
         console.log(`This is the find function`);
-    }   
+    }
 
 
-    //schema function used for all models
-    schema(){
+    //This function is to define the scheme
+    schema() {
         return {};
-    } 
+    }
+
+    //This function is to define the required attributes
+    required() {
+        return [];
+    }
+
+    //This function is to define the validation for each attribute
+    validations() {
+        return [];
+    }
+
+    //This function is to get an attribute
+    getAttribute(attr) {
+        return this[attr] || null;
+    }
+
+    //This function is to get an attribute
+    setAttribute(attr, value) {
+        if (attr in this) {
+            this[attr] = value;
+            return this[attr] === value;
+        }
+        return false;
+    }
 }
 
 //Here we export the class

@@ -11,8 +11,7 @@ class User extends Model {
      * @param {*} attributes 
      */
     constructor(attributes = {}) {
-        super();
-        this.attributes = attributes;
+        super(attributes);
     }
 
     //This function is to define the schema
@@ -30,6 +29,16 @@ class User extends Model {
     //This function is to define the required attributes
     required() {
         return [];
+    }
+
+    //This function is to define the validation for each attribute
+    validations() {
+        return [];
+    }
+
+    //This function is to get properties
+    get(target, prop) {
+        return this[prop] || 'MAGIC';
     }
 }
 

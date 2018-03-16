@@ -37,15 +37,43 @@ module.exports = {
         }
     },
 
-    //This function builds a Mongoose Schema
+    /**
+     * This function builds a Mongoose Schema
+     * @param {*} schema 
+     * @param {*} driver 
+     */
     buildSchema(schema, driver = 'mongoose') {
-
         let newSchema = {};
-
         for (const key of Object.keys(schema)) {
             newSchema[key] = schemas[schema[key]][driver];
         }
-
         return newSchema;
+    },
+
+    /**
+     * This function is to assign all the attributes to the current class
+     * @param {*} attributes 
+     * @param {*} obj 
+     */
+    assignAttributes(attributes, obj) {
+        if (Object.keys(attributes).length > 0) {
+            for (var attr in attributes) {
+                obj[attr] = attributes[attr];
+            }
+        }
+    },
+
+    /**
+     * This function is to sync all the attributes
+     * @param {*} obj 
+     */
+    syncAttributes(attributes, obj) {
+        var _attributes = {};
+        if (Object.keys(attributes).length > 0) {
+            for (var attr in attributes) {
+                _attributes[attr] = obj[attr];
+            }
+        }
+        return _attributes;
     }
 };
