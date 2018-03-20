@@ -6,11 +6,12 @@ const { createLogger, format, transports } = require('winston');
 const { combine, timestamp, label, prettyPrint } = format;
 
 //Date for the file log
-const dateObj   = new Date();
-const month     = dateObj.getUTCMonth() + 1; 
-const day       = dateObj.getUTCDate();
-const year      = dateObj.getUTCFullYear();
-const date      = year + "-" + month + "-" + day;
+const dateObj = new Date();
+const month = dateObj.getUTCMonth() + 1;
+const day = dateObj.getUTCDate();
+const year = dateObj.getUTCFullYear();
+const date = year + "-" + month + "-" + day;
+
 
 //Here we create the logger
 const logger = createLogger({

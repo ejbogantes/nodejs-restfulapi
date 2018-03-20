@@ -10,7 +10,7 @@ require('dotenv').config()
 
 //Root paths
 const appRoot         = require('app-root-path');
-const appConfigPath   = appRoot + '/config/';
+const appConfigPath   = '../config/';
 
 //Here are the configuration values
 const Config = {
@@ -18,14 +18,10 @@ const Config = {
     //General Settings
     appRoot: appRoot + '',
     appPort: process.env.PORT || 8001,
+    appUrl: process.env.APP_URL || 'http://localhost',
     
     //Database Settings
-    databaseConns: require(appConfigPath + '_database'),
-    defaultDBConn:      'mongodb',
-    defaultDBHost:      'localhost',
-    defaultDBUser:      '',
-    defaultDBPassword:  '',
-    defaultDBPort:      27017,
+    database: require(appConfigPath + '_database'),
 
     //Email Settings
     defaultEmailDriver: 'mailgun',
