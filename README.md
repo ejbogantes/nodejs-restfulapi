@@ -27,9 +27,9 @@ $ ./stop.sh
 
 ### How to view the project
 
-For API browse to http://localhost:8001
-For Mongo Express browse to http://localhost:8081
-For Swagger UI browse to http://localhost
+- For API browse to http://localhost:8001
+- For Mongo Express browse to http://localhost:8081
+- For Swagger UI browse to http://localhost
 
 Documentation in progress...
 
