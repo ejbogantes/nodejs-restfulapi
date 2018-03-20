@@ -9,8 +9,8 @@
 require('dotenv').config()
 
 //Root paths
-const appRoot         = require('app-root-path');
-const appConfigPath   = '../config/';
+const appRoot = require('app-root-path');
+const appConfigPath = '../config/';
 
 //Here are the configuration values
 const Config = {
@@ -19,13 +19,17 @@ const Config = {
     appRoot: appRoot + '',
     appPort: process.env.PORT || 8001,
     appUrl: process.env.APP_URL || 'http://localhost',
-    
+
     //Database Settings
     database: require(appConfigPath + '_database'),
 
     //Email Settings
     defaultEmailDriver: 'mailgun',
     emailDrivers: require(appConfigPath + '_email'),
+
+
+    //Localization Settings
+    defaultLanguage: process.env.DEFAULT_LANG || 'en'
 };
 
 //Here we export the configuration values
