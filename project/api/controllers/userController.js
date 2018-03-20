@@ -2,7 +2,7 @@
 'use strict';
 
 //required files
-var mongoose = require('mongoose');
+const mongoose = require('mongoose');
 
 //Here we declare the functions for the UserController
 var UserController = {
@@ -16,7 +16,7 @@ var UserController = {
             res.send('This function is not implemented!');
         },
         show: function (req, res) {
-            
+
             res.send('This function is not implemented!');
         },
         edit: function (req, res) {

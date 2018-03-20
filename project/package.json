@@ -17,6 +17,7 @@
   "license": "ISC",
   "dependencies": {
     "app-root-path": "^2.0.1",
+    "connect-ensure-login": "^0.1.1",
     "cors": "^2.8.4",
     "dookie": "^0.2.0",
     "dotenv": "^5.0.1",
@@ -24,6 +25,8 @@
     "glob": "^7.1.2",
     "mongoose": "^5.0.9",
     "mysql2": "^1.5.2",
+    "oauth2orize": "^1.11.0",
+    "oauth2orize-jwt-bearer": "^0.2.0",
     "passport": "^0.4.0",
     "passport-http-bearer": "^1.0.1",
     "sequelize": "^4.35.2",

@@ -13,9 +13,15 @@ const Server = {
   //CORS capabilites
   CORS: require('cors')
 };
+
 //We enable CORS
 Server.App.use(Server.CORS());
+
+//Register oauth2
+require('./core/oauth2/router').register(Server.App);
+
 //Register all routers
 require('./core/registerRouters').register(Server.App);
+
 //We export the server
 module.exports = Server;

@@ -6,6 +6,9 @@ const app = require('express'),
     authMiddleware = require('../middlewares/authMiddleware'),
     userController = require('../controllers/userController');
 
+
+
+
 //The GET routes
 router.get('/', authMiddleware.isAuthorized, userController.get.index);
 router.get('/create', userController.get.create);
