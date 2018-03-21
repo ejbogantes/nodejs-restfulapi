@@ -26,7 +26,6 @@ module.exports = function () {
     var strategy = new Strategy(params, function (payload, done) {
         var userModel = mongoose.model('User');
         userModel.findOne({ _id: payload.id }, function (err, user) {
-            console.log(user._id);
             if (user) {
                 return done(null, {
                     id: user._id
@@ -52,12 +51,6 @@ module.exports = function () {
         },
         token: function (req, res) {
 
-            //the http code / message to return
-            let errorCode = 401;
-            let message = errorsHelper.error('unauthorized');
-            //let's build the error block
-            let error = errorsHelper.json(errorCode, errorsHelper.levels.WARN, message);
-
             if (req.body.email && req.body.password) {
 
                 var userModel = mongoose.model('User');
@@ -76,12 +69,13 @@ module.exports = function () {
                             });
                         } else {
                             //return the error
-                            res.status(errorCode).json(error);
+                            errorsHelper.response(res, 401, 'unauthorized');
                         }
                     });
+
             } else {
                 //return the error
-                res.status(errorCode).json(error);
+                errorsHelper.response(res, 401, 'unauthorized');
             }
         }
     };
