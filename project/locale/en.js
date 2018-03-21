@@ -33,7 +33,8 @@ const Strings = {
     },
     error_messages: {
         //General
-        unauthorized: "The authentication failed. Please check your credentials"
+        unauthorized: "The authentication failed. Please check your credentials.",
+        userdoesnotexist: "The user does not exist. Please check your credentials."
     }
 };
 

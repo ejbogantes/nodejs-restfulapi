@@ -2,8 +2,8 @@
 'use strict';
 
 //required files
-const errorsHelper = require('../helpers/error');
-const passport     = require('passport');
+const errorsHelper = require('../../core/helpers/error'),
+    passport = require('passport');
 
 //Authentication Middleware
 var authMiddleware = {
@@ -19,7 +19,7 @@ var authMiddleware = {
         if (!isAuthorized) {
             //the http code / message to return
             let errorCode = 401;
-            let message   = errorsHelper.error('unauthorized');
+            let message = errorsHelper.error('unauthorized');
             //let's build the error block
             let error = errorsHelper.json(errorCode, errorsHelper.levels.WARN, message);
             //return the error

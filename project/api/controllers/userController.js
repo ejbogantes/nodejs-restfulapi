@@ -27,7 +27,20 @@ var UserController = {
     //All POST functions
     post: {
         store: function (req, res) {
-            res.send('This function is not implemented!');
+            var userModel = mongoose.model('User');
+            userModel.create({
+                document: '207010082',
+                first_name: 'Emilio',
+                last_name: 'Bogantes',
+                username: 'ejbogantes',
+                email: 'ejbogantes@gmail.com',
+                password: '1234',
+                profile_image: ''
+            }, function (err, small) {
+                if (err) res.sendStatus(400);
+
+                res.sendStatus(200);
+            });
         }
     },
 
