@@ -81,5 +81,13 @@ module.exports = {
         let strings = require('../../locale/' + lang);
         //return the error
         return strings.error_messages[key] || 'No description';
+    },
+
+
+    response: function (res, code, key) {
+        //return the error
+        res.status(code).json(this.json(code,
+            this.levels.WARN,
+            this.error(key)));
     }
 };
