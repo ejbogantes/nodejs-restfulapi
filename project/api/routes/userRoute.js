@@ -3,16 +3,16 @@
 
 const app = require('express'),
     router = app.Router(),
-    authMiddleware = require('../middlewares/authMiddleware'),
+    auth = require('../../core/oauth2')(),
     userController = require('../controllers/userController');
 
 
 
 
 //The GET routes
-router.get('/', authMiddleware.isAuthorized, userController.get.index);
+router.get('/', auth.authenticate(), userController.get.index);
 router.get('/create', userController.get.create);
-router.get('/:id', userController.get.show);
+router.get('/:id', auth.authenticate(), userController.get.show);
 router.get('/:id/edit', userController.get.edit);
 
 //The POST routes

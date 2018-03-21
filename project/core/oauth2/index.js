@@ -1,233 +1,89 @@
 'use strict';
 
-const config = require('../../config/_config'),
-    oauth2orize = require('oauth2orize'),
+//required files
+const errorsHelper = require('../../core/helpers/error');
+var config = require('../../config/_config'),
     passport = require('passport'),
-    login = require('connect-ensure-login'),
-    mongoose = require('mongoose');
+    passportJWT = require("passport-jwt"),
+    mongoose = require('mongoose'),
+    jwtManager = require("jwt-simple"),
+    ExtractJwt = passportJWT.ExtractJwt,
+    Strategy = passportJWT.Strategy,
+    JWT = config.auth.JWT;
 
-var jwtBearer = require('oauth2orize-jwt-bearer').Exchange;
+//the params for passport
+var params = {
+    secretOrKey: JWT.secret,
+    jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken()
+};
 
-// Create OAuth 2.0 server
-var server = oauth2orize.createServer();
+/**
+ * This function is to get a token
+ */
+module.exports = function () {
 
-// Register serialialization and deserialization functions.
-//
-// When a client redirects a user to user authorization endpoint, an
-// authorization transaction is initiated. To complete the transaction, the
-// user must authenticate and approve the authorization request. Because this
-// may involve multiple HTTP request/response exchanges, the transaction is
-// stored in the session.
-//
-// An application must supply serialization functions, which determine how the
-// client object is serialized into the session. Typically this will be a
-// simple matter of serializing the client's ID, and deserializing by finding
-// the client by ID from the database.
 
-server.serializeClient((client, done) => done(null, client.id));
-
-server.deserializeClient((id, done) => {
-    db.clients.findById(id, (error, client) => {
-        if (error) return done(error);
-        return done(null, client);
-    });
-});
-
-// Register supported grant types.
-//
-// OAuth 2.0 specifies a framework that allows users to grant client
-// applications limited access to their protected resources. It does this
-// through a process of the user granting access, and the client exchanging
-// the grant for an access token.
-
-// Grant authorization codes. The callback takes the `client` requesting
-// authorization, the `redirectUri` (which is used as a verifier in the
-// subsequent exchange), the authenticated `user` granting access, and
-// their response, which contains approved scope, duration, etc. as parsed by
-// the application. The application issues a code, which is bound to these
-// values, and will be exchanged for an access token.
-
-server.grant(oauth2orize.grant.code((client, redirectUri, user, ares, done) => {
-    const code = utils.getUid(16);
-    db.authorizationCodes.save(code, client.id, redirectUri, user.id, (error) => {
-        if (error) return done(error);
-        return done(null, code);
-    });
-}));
-
-// Grant implicit authorization. The callback takes the `client` requesting
-// authorization, the authenticated `user` granting access, and
-// their response, which contains approved scope, duration, etc. as parsed by
-// the application. The application issues a token, which is bound to these
-// values.
-
-server.grant(oauth2orize.grant.token((client, user, ares, done) => {
-    const token = utils.getUid(256);
-    db.accessTokens.save(token, user.id, client.clientId, (error) => {
-        if (error) return done(error);
-        return done(null, token);
-    });
-}));
-
-// Exchange authorization codes for access tokens. The callback accepts the
-// `client`, which is exchanging `code` and any `redirectUri` from the
-// authorization request for verification. If these values are validated, the
-// application issues an access token on behalf of the user who authorized the
-// code.
-
-server.exchange(oauth2orize.exchange.code((client, code, redirectUri, done) => {
-    db.authorizationCodes.find(code, (error, authCode) => {
-        if (error) return done(error);
-        if (client.id !== authCode.clientId) return done(null, false);
-        if (redirectUri !== authCode.redirectUri) return done(null, false);
-
-        const token = utils.getUid(256);
-        db.accessTokens.save(token, authCode.userId, authCode.clientId, (error) => {
-            if (error) return done(error);
-            return done(null, token);
+    var strategy = new Strategy(params, function (payload, done) {
+        var userModel = mongoose.model('User');
+        userModel.findOne({ _id: payload.id }, function (err, user) {
+            console.log(user._id);
+            if (user) {
+                return done(null, {
+                    id: user._id
+                });
+            } else {
+                //the http code / message to return
+                let errorCode = 401;
+                let message = errorsHelper.error('unauthorized');
+                //let's build the error block
+                let error = errorsHelper.json(errorCode, errorsHelper.levels.WARN, message);
+                //return the error
+                res.status(errorCode).json(error);
+            }
         });
     });
-}));
+    passport.use(strategy);
+    return {
+        initialize: function () {
+            return passport.initialize();
+        },
+        authenticate: function () {
+            return passport.authenticate("jwt", { session: JWT.session });
+        },
+        token: function (req, res) {
 
-// Exchange user id and password for access tokens. The callback accepts the
-// `client`, which is exchanging the user's name and password from the
-// authorization request for verification. If these values are validated, the
-// application issues an access token on behalf of the user who authorized the code.
+            //the http code / message to return
+            let errorCode = 401;
+            let message = errorsHelper.error('unauthorized');
+            //let's build the error block
+            let error = errorsHelper.json(errorCode, errorsHelper.levels.WARN, message);
 
-server.exchange(oauth2orize.exchange.password((client, username, password, scope, done) => {
-    // Validate the client
-    db.clients.findByClientId(client.clientId, (error, localClient) => {
-        if (error) return done(error);
-        if (!localClient) return done(null, false);
-        if (localClient.clientSecret !== client.clientSecret) return done(null, false);
-        // Validate the user
-        db.users.findByUsername(username, (error, user) => {
-            if (error) return done(error);
-            if (!user) return done(null, false);
-            if (password !== user.password) return done(null, false);
-            // Everything validated, return the token
-            const token = utils.getUid(256);
-            db.accessTokens.save(token, user.id, client.clientId, (error) => {
-                if (error) return done(error);
-                return done(null, token);
-            });
-        });
-    });
-}));
+            if (req.body.email && req.body.password) {
 
-// Exchange the client id and password/secret for an access token. The callback accepts the
-// `client`, which is exchanging the client's id and password/secret from the
-// authorization request for verification. If these values are validated, the
-// application issues an access token on behalf of the client who authorized the code.
+                var userModel = mongoose.model('User');
+                var email = req.body.email;
+                var password = req.body.password;
 
-server.exchange(oauth2orize.exchange.clientCredentials((client, scope, done) => {
-    // Validate the client
-    db.clients.findByClientId(client.clientId, (error, localClient) => {
-        if (error) return done(error);
-        if (!localClient) return done(null, false);
-        if (localClient.clientSecret !== client.clientSecret) return done(null, false);
-        // Everything validated, return the token
-        const token = utils.getUid(256);
-        // Pass in a null for user id since there is no user with this grant type
-        db.accessTokens.save(token, null, client.clientId, (error) => {
-            if (error) return done(error);
-            return done(null, token);
-        });
-    });
-}));
+                userModel.findOne({ email: email, password: password },
+                    function (err, user) {
+                        if (user) {
+                            var payload = {
+                                id: user._id
+                            };
+                            var token = jwtManager.encode(payload, JWT.secret);
+                            res.json({
+                                token: token
+                            });
+                        } else {
+                            //return the error
+                            res.status(errorCode).json(error);
+                        }
+                    });
+            } else {
+                //return the error
+                res.status(errorCode).json(error);
+            }
+        }
+    };
+};
 
-server.exchange('urn:ietf:params:oauth:grant-type:jwt-bearer', jwtBearer(function (client, data, signature, done) {
-    var crypto = require('crypto')
-        , fs = require('fs') //load file system so you can grab the public key to read.
-        , pub = fs.readFileSync(config.appRoot + '/core/oauth2/public.pem').toString() //load PEM format public key as string, should be clients public key
-        , verifier = crypto.createVerify("RSA-SHA256");
-
-    //verifier.update takes in a string of the data that is encrypted in the signature  
-    verifier.update(JSON.stringify(data));
-
-    if (verifier.verify(pub, signature, 'base64')) {
-        //base64url decode data 
-        var b64string = data;
-        var buf = new Buffer(b64string, 'base64').toString('ascii');
-
-        // TODO - verify client_id, scope and expiration are valid from the buf variable above
-
-        AccessToken.create(client, scope, function (err, accessToken) {
-            if (err) { return done(err); }
-            done(null, accessToken);
-        });
-    }
-}));
-
-
-// User authorization endpoint.
-//
-// `authorization` middleware accepts a `validate` callback which is
-// responsible for validating the client making the authorization request. In
-// doing so, is recommended that the `redirectUri` be checked against a
-// registered value, although security requirements may vary accross
-// implementations. Once validated, the `done` callback must be invoked with
-// a `client` instance, as well as the `redirectUri` to which the user will be
-// redirected after an authorization decision is obtained.
-//
-// This middleware simply initializes a new authorization transaction. It is
-// the application's responsibility to authenticate the user and render a dialog
-// to obtain their approval (displaying details about the client requesting
-// authorization). We accomplish that here by routing through `ensureLoggedIn()`
-// first, and rendering the `dialog` view.
-
-module.exports.authorization = [
-    login.ensureLoggedIn(),
-    server.authorization((clientId, redirectUri, done) => {
-        db.clients.findByClientId(clientId, (error, client) => {
-            if (error) return done(error);
-            // WARNING: For security purposes, it is highly advisable to check that
-            //          redirectUri provided by the client matches one registered with
-            //          the server. For simplicity, this example does not. You have
-            //          been warned.
-            return done(null, client, redirectUri);
-        });
-    }, (client, user, done) => {
-        // Check if grant request qualifies for immediate approval
-
-        // Auto-approve
-        if (client.isTrusted) return done(null, true);
-
-        db.accessTokens.findByUserIdAndClientId(user.id, client.clientId, (error, token) => {
-            // Auto-approve
-            if (token) return done(null, true);
-
-            // Otherwise ask user
-            return done(null, false);
-        });
-    }),
-    (request, response) => {
-        response.render('dialog', { transactionId: request.oauth2.transactionID, user: request.user, client: request.oauth2.client });
-    },
-];
-
-// User decision endpoint.
-//
-// `decision` middleware processes a user's decision to allow or deny access
-// requested by a client application. Based on the grant type requested by the
-// client, the above grant middleware configured above will be invoked to send
-// a response.
-
-exports.decision = [
-    login.ensureLoggedIn(),
-    server.decision(),
-];
-
-
-// Token endpoint.
-//
-// `token` middleware handles client requests to exchange authorization grants
-// for access tokens. Based on the grant type being exchanged, the above
-// exchange middleware will be invoked to handle the request. Clients must
-// authenticate when making requests to this endpoint.
-
-exports.token = [
-    passport.authenticate('bearer', { session: false }),
-    server.token(),
-    server.errorHandler(),
-];
